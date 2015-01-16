@@ -1,0 +1,4 @@
+2015-1-16:
+	New for syntax analyzing of regular expression.
+	Type support:
+	& | ( )

@@ -121,7 +121,9 @@ bool need_cat_p (char c, char ca)
 {
 	if ((entity_p (c) && entity_p (ca))
 		|| (entity_p (ca) && c == '(')
-		|| (entity_p (c) && ca == '*'))
+		|| (entity_p (c) && ca == '*')
+		|| (entity_p (c) && ca == ')')
+		|| (ca == '*' && c == '('))
 		return true;
 	return false;
 }
