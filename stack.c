@@ -46,7 +46,7 @@ static stree_p adjust_stack_1 (int proi, int last)
 		ret->lchild = adjust_stack_1 (proi, last);
 	}
 	else {
-		//ret->lchild = adjust_stack_1 (proi, last);
+		/* Integrate the STAR EXPR as a symbol then continue.  */
 		ret->lchild = pop_stack (&sym_stack);
 		push_stack (ret, &sym_stack);
 		return adjust_stack_1 (proi, last);
@@ -58,11 +58,11 @@ void adjust_stack (stree_p stree)
 {
 	stree_p adj;
 	if (stree == NULL) {
-		//while (!stack_empty_p (op_stack)) {
-			adj = adjust_stack_1 (1, 0);
-			push_stack (adj, &sym_stack);
-			adj = adjust_stack_1 (0, 1);
-		//}
+		/* First of all, reduce to priority level 1.  */
+		adj = adjust_stack_1 (1, 0);
+		push_stack (adj, &sym_stack);
+		/* Then pop all result.  */
+		adj = adjust_stack_1 (0, 1);
 		push_stack (adj, &sym_stack);
 	}
 	else {

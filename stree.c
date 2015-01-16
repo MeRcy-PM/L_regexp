@@ -105,6 +105,7 @@ stree_p build_stree_node (short id)
 		node->type = NODE_ENTITY,
 		node->id = id;
 		node->sindex = status++;
+		node->nullable = false;
 	}
 	return node;
 }
