@@ -36,6 +36,6 @@ extern void print_stree (stree_p);
 extern stree_p build_stree_node (short);
 extern void build_syntax_tree (char *);
 extern bool entity_p (char);
-#define GET_STATUS(s) ((s)->sindex.sindex)
+extern void stree_finit (void);
 #define GET_PRIORITY(s) (priority[(s)->type])
 #endif
