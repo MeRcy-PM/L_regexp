@@ -1,7 +1,7 @@
 #include "stree.h"
 #include "stack.h"
 stree_p syntax_tree = NULL;
-unsigned int status = 0;
+unsigned int status = 1;
 void stree_init ()
 {
 	stack_stree_init ();	
@@ -50,7 +50,12 @@ void print_stree_1 (stree_p node, int deep)
 	print_stree_1 (node->lchild, deep + 1);
 	print_table (deep);
 	print_id (node);
-	printf ("  na %s\n", node->nullable ? "true" : "false");
+	if (node->type == NODE_ENTITY)
+		printf (" Index:%d", node->sindex);
+	printf ("  na %s", node->nullable ? "true" : "false");
+	print_set ("  first", node->first_op);
+	print_set ("  last", node->last_op);
+	printf ("\n");
 	print_stree_1 (node->rchild, deep + 1);
 	return;
 }
@@ -230,4 +235,22 @@ void print_set (char *set_name, set_p set)
 		printf ("%d ", set->value);
 		set = set->next;
 	}
+}
+
+set_p set_copy (set_p set)
+{
+	if (set == NULL)
+		return NULL;
+	set_p head;
+	set_p new = new_set_node ();
+	new->value = set->value;
+	head = new;
+	set = set->next;
+	while (set) {
+		new->next = new_set_node ();
+		new = new->next;
+		new->value = set->value;
+		set = set->next;
+	}
+	return head;
 }

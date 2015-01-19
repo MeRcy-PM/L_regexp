@@ -50,9 +50,11 @@ int main (int argc, char **argv)
 	}
 	build_syntax_tree (argv[1]);
 	compute_nullable ();
+	compute_first_op ();
+	compute_last_op ();
 	print_stree (NULL);
 	stree_finit ();
-	test_set_union ();
+	//test_set_union ();
 	return 0;
 }
 

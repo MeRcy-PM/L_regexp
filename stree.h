@@ -42,5 +42,6 @@ extern set_p set_union (set_p, set_p);
 extern bool in_set_p (set_p, int);
 extern set_p new_set_node (void);
 extern void print_set (char *, set_p);
+extern set_p set_copy (set_p);
 #define GET_PRIORITY(s) (priority[(s)->type])
 #endif
