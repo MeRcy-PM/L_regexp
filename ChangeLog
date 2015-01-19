@@ -5,4 +5,6 @@
 
 2015-1-18:
 	Postorder Traversal for compute nullable.
-
+2015-1-19:
+	In order for debug, traversal for compute first_op and last_op.
+	These three calculations may can be combined. (Todo)
