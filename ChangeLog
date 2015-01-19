@@ -2,3 +2,7 @@
 	New for syntax analyzing of regular expression.
 	Type support:
 	& | ( )
+
+2015-1-18:
+	Postorder Traversal for compute nullable.
+

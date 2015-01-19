@@ -23,19 +23,19 @@ static void print_id (stree_p node)
 {
 	switch (node->type) {
 	case NODE_CAT:
-		printf ("AND\n");
+		printf ("AND");
 		break;
 	case NODE_OR:
-		printf ("OR\n");
+		printf ("OR");
 		break;
 	case NODE_STAR:
-		printf ("STAR\n");
+		printf ("STAR");
 		break;
 	case NODE_ENTITY:
-		printf ("ENTITY (%c)\n", node->id);
+		printf ("ENTITY (%c)", node->id);
 		break;
 	case NODE_BRACKET:
-		printf ("BRACKET\n");
+		printf ("BRACKET");
 		break;
 	default:
 		break;
@@ -50,6 +50,7 @@ void print_stree_1 (stree_p node, int deep)
 	print_stree_1 (node->lchild, deep + 1);
 	print_table (deep);
 	print_id (node);
+	printf ("  na %s\n", node->nullable ? "true" : "false");
 	print_stree_1 (node->rchild, deep + 1);
 	return;
 }
@@ -154,4 +155,19 @@ void build_syntax_tree (char *s)
 	stree_init ();
 	syntax_tree = build_syntax_tree_1 (s, false);
 	return;
+}
+
+void stree_free_node (stree_p stree)
+{
+	if (stree == NULL)
+		return;
+
+	stree_free_node (stree->lchild);
+	stree_free_node (stree->rchild);
+	free (stree);
+}
+
+void stree_finit ()
+{
+	stree_free_node (syntax_tree);
 }

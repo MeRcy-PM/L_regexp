@@ -1,4 +1,5 @@
 #include "stree.h"
+#include "dfa.h"
 
 void test_print_stree ()
 {
@@ -18,7 +19,9 @@ int main (int argc, char **argv)
 		exit (1);
 	}
 	build_syntax_tree (argv[1]);
+	compute_nullable ();
 	print_stree (NULL);
+	stree_finit ();
 	return 0;
 }
 
