@@ -171,3 +171,63 @@ void stree_finit ()
 {
 	stree_free_node (syntax_tree);
 }
+
+set_p new_set_node ()
+{
+	set_p new = (set_p)malloc (sizeof (struct set));
+	new->next = NULL;
+	new->value = -1;
+	return new;
+}
+
+bool in_set_p (set_p s, int value)
+{
+	while (s) {
+		if (s->value == value)
+			return true;
+		s = s->next;
+	}
+	return false;
+}
+
+set_p set_union (set_p s1, set_p s2)
+{
+	set_p new = new_set_node ();
+	set_p tail = new;
+	set_p tmp = s1;
+	/* Copy s1.  */
+	while (1) {
+		tail->value = tmp->value;
+		if (tmp->next) {
+			tail->next = new_set_node ();
+			tail = tail->next;
+			tmp = tmp->next;
+		}
+		else 
+			break;
+	}
+
+	tmp = s2;
+	/* Union s2.  */
+	while (1) {
+		if (tmp == NULL)
+			break;
+
+		if (!in_set_p (s1, tmp->value)) {
+			tail->next = new_set_node ();
+			tail = tail->next;
+			tail->value = tmp->value;
+		}
+		tmp = tmp->next;
+	}
+	return new;
+}
+
+void print_set (char *set_name, set_p set)
+{
+	printf ("%s :", set_name);
+	while (set) {
+		printf ("%d ", set->value);
+		set = set->next;
+	}
+}

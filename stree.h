@@ -37,5 +37,10 @@ extern stree_p build_stree_node (short);
 extern void build_syntax_tree (char *);
 extern bool entity_p (char);
 extern void stree_finit (void);
+
+extern set_p set_union (set_p, set_p);
+extern bool in_set_p (set_p, int);
+extern set_p new_set_node (void);
+extern void print_set (char *, set_p);
 #define GET_PRIORITY(s) (priority[(s)->type])
 #endif
