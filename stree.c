@@ -8,7 +8,7 @@ void free_set (set_p set)
 	while (set) {
 		tmp = set;
 		set = set->next;
-		free (set);
+		free (tmp);
 	}
 }
 
