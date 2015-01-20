@@ -1,10 +1,10 @@
 #include "stree.h"
 #include "stack.h"
 stree_p syntax_tree = NULL;
-unsigned int status = 1;
 void stree_init ()
 {
-	stack_stree_init ();	
+	stack_stree_init ();
+	graph_init ();
 	memset (&priority, 0, NODE_TOTAL);
 	priority[NODE_CAT] = 1;
 	priority[NODE_OR] = 1;
@@ -111,6 +111,7 @@ stree_p build_stree_node (short id)
 		node->type = NODE_ENTITY,
 		node->id = id;
 		node->sindex = status++;
+		node->vertex = build_vertex_node (node->sindex, node);
 		node->nullable = false;
 	}
 	return node;
@@ -254,3 +255,4 @@ set_p set_copy (set_p set)
 	}
 	return head;
 }
+

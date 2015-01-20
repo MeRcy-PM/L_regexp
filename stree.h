@@ -1,6 +1,7 @@
 #ifndef __STREE__
 #define __STREE__
 #include "base.h"
+#include "graph.h"
 enum tree_type {
 	NODE_INIT = 0,
 	NODE_CAT,
@@ -26,6 +27,7 @@ struct stree_node {
 	set_p first_op;
 	set_p last_op;
 	unsigned int sindex;
+	struct vertex* vertex;
 	unsigned short id;
 };
 

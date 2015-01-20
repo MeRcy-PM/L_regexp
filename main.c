@@ -52,7 +52,9 @@ int main (int argc, char **argv)
 	compute_nullable ();
 	compute_first_op ();
 	compute_last_op ();
+	build_graph ();
 	print_stree (NULL);
+	print_graph ();
 	stree_finit ();
 	//test_set_union ();
 	return 0;
