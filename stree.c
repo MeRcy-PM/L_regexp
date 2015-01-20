@@ -1,6 +1,17 @@
 #include "stree.h"
 #include "stack.h"
 stree_p syntax_tree = NULL;
+
+void free_set (set_p set)
+{
+	set_p tmp;
+	while (set) {
+		tmp = set;
+		set = set->next;
+		free (set);
+	}
+}
+
 void stree_init ()
 {
 	stack_stree_init ();
@@ -168,6 +179,12 @@ void stree_free_node (stree_p stree)
 	if (stree == NULL)
 		return;
 
+	if (stree->first_op)
+		free_set (stree->first_op);
+	
+	if (stree->last_op)
+		free_set (stree->last_op);
+
 	stree_free_node (stree->lchild);
 	stree_free_node (stree->rchild);
 	free (stree);
@@ -176,6 +193,8 @@ void stree_free_node (stree_p stree)
 void stree_finit ()
 {
 	stree_free_node (syntax_tree);
+	free_graph ();
+	free_vertex ();
 }
 
 set_p new_set_node ()

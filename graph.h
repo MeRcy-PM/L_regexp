@@ -31,4 +31,6 @@ extern vertex_p build_vertex_node (int, struct stree_node*);
 extern void graph_init (void);
 extern void print_graph (void);
 extern void build_graph (void);
+extern void free_graph (void);
+extern void free_vertex (void);
 #endif

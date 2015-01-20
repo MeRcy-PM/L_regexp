@@ -50,3 +50,18 @@ void build_graph ()
 		tmp = tmp->next;
 	}
 }
+
+void free_graph ()
+{
+	free (sgraph.vertex_pp);
+}
+
+void free_vertex ()
+{
+	vertex_p tmp;
+	while (start_s) {
+		tmp = start_s;
+		start_s = start_s->next;
+		free (tmp);
+	}
+}
