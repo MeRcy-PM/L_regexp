@@ -55,3 +55,8 @@ void compute_property ()
 	compute_property_1 (syntax_tree);
 	return;
 }
+
+void compute_nfa_trans ()
+{
+
+}
