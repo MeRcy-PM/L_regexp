@@ -6,9 +6,9 @@ void stree_init ()
 	stack_stree_init ();
 	graph_init ();
 	memset (&priority, 0, NODE_TOTAL);
-	priority[NODE_CAT] = 1;
+	priority[NODE_CAT] = 2;
 	priority[NODE_OR] = 1;
-	priority[NODE_STAR] = 2;
+	priority[NODE_STAR] = 3;
 }
 
 static void inline print_table (int deep)
