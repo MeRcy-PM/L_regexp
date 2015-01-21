@@ -56,7 +56,24 @@ void compute_property ()
 	return;
 }
 
+void compute_follow_op (stree_p stree)
+{
+	if (stree == NULL)
+		return;
+	
+	/* P112.  */
+	if (stree->type == NODE_STAR)
+		add_edge (stree->last_op, stree->first_op);
+
+	if (stree->type == NODE_CAT)
+		add_edge (stree->lchild->last_op, stree->rchild->first_op);
+	
+	compute_follow_op (stree->lchild);
+	compute_follow_op (stree->rchild);
+	return;
+}
+
 void compute_nfa_trans ()
 {
-
+	compute_follow_op (syntax_tree);
 }

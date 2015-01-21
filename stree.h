@@ -1,5 +1,5 @@
-#ifndef __STREE__
-#define __STREE__
+#ifndef __STREE_H__
+#define __STREE_H__
 #include "base.h"
 #include "graph.h"
 enum tree_type {
@@ -45,5 +45,6 @@ extern bool in_set_p (set_p, int);
 extern set_p new_set_node (void);
 extern void print_set (char *, set_p);
 extern set_p set_copy (set_p);
+extern void add_edge (struct set*, struct set*);
 #define GET_PRIORITY(s) (priority[(s)->type])
 #endif
