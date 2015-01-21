@@ -81,3 +81,54 @@ void compute_nfa_trans ()
 	free_set (set_zero);
 	compute_follow_op (syntax_tree);
 }
+
+char *match_string = NULL;
+
+void copy_to_match_string (char *start, char *last)
+{
+	if (match_string == NULL) {
+		match_string = (char *)malloc (last - start + 1);
+		strncpy (match_string, start, last - start);
+		match_string[last - start] = '\0';
+		return;
+	}
+	else
+	{
+		int len_old = strlen (match_string);
+		if (len_old >= last - start)
+			return;
+
+		free (match_string);
+		match_string = (char *)malloc (last - start + 1);
+		strncpy (match_string, start, last - start);
+		match_string[last - start] = '\0';
+		return;
+	}
+}
+
+void match_status (char *start, char *s, int status)
+{
+	struct edge* edge = sgraph.vertex_pp[status]->edge;
+	if (in_set_p (syntax_tree->last_op, status)) {
+		copy_to_match_string (start, s);
+		return;
+	}
+
+	if (*s == '\0')
+		return;
+
+	while (edge) {
+		if (*s == edge->trans->id)
+			match_status (start, s + 1, edge->dest);
+		edge = edge->next;
+	}
+	return;
+}
+
+void match_expr (char *s)
+{
+	while (*s != '\0') {
+		match_status (s, s, 0);
+		s++;
+	}
+}

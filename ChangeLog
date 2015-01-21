@@ -8,4 +8,7 @@
 2015-1-19:
 	In order for debug, traversal for compute first_op and last_op.
 2015-1-21:
-	Compute nfa. Not consider Status Start (TODO).
+	Compute nfa.
+2015-1-21:
+	Match the string.
+	TODO: multi-match.
