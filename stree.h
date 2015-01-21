@@ -46,5 +46,6 @@ extern set_p new_set_node (void);
 extern void print_set (char *, set_p);
 extern set_p set_copy (set_p);
 extern void add_edge (struct set*, struct set*);
+extern void free_set (set_p);
 #define GET_PRIORITY(s) (priority[(s)->type])
 #endif

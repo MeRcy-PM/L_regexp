@@ -75,5 +75,9 @@ void compute_follow_op (stree_p stree)
 
 void compute_nfa_trans ()
 {
+	set_p set_zero = new_set_node ();
+	set_zero->value = 0;
+	add_edge (set_zero, syntax_tree->first_op);
+	free_set (set_zero);
 	compute_follow_op (syntax_tree);
 }

@@ -28,6 +28,15 @@ vertex_p build_vertex_node (int index, struct stree_node* stree)
 	return new;
 }
 
+void print_edge (struct edge* edge)
+{
+	while (edge) {
+		printf ("\tFrom Index %d to Index %d, Trans Key word is %c\n",
+				edge->src, edge->dest, edge->trans->id);
+		edge = edge->next;
+	}
+}
+
 void print_graph ()
 {
 	int i;
@@ -35,15 +44,12 @@ void print_graph ()
 	printf ("--------------------PRINT GRAPH------------------\n");
 	printf ("Total Vertex number is %d\n", sgraph.n_vertex);
 	printf ("INDEX 0: Start Status.\n");
+	printf ("Print edge of INDEX 0\n");
+	print_edge (sgraph.vertex_pp[0]->edge);
 	for (i = 1; i < sgraph.n_vertex; i++) {
 		printf ("INDEX %d: element is %c\n", i, sgraph.vertex_pp[i]->stree->id);
-		tmp = sgraph.vertex_pp[i]->edge;
 		printf ("Print edge of INDEX %d\n", i);
-		while (tmp) {
-			printf ("\tFrom Index %d to Index %d, Trans Key word is %c\n",
-					tmp->src, tmp->dest, tmp->trans->id);
-			tmp = tmp->next;
-		}
+		print_edge (sgraph.vertex_pp[i]->edge);
 	}
 }
 
@@ -88,10 +94,10 @@ void add_edge_1 (int src, int dest)
 {
 	struct edge* tmp;
 	/* If the edge is exist, no need to add.  */
-	tmp = (GET_STREE (src))->vertex->edge;
+	tmp = sgraph.vertex_pp[src]->edge;
 	/* No edge, must add to stree.  */
 	if (tmp == NULL) {
-		(GET_STREE (src))->vertex->edge = new_edge (src, dest);
+		sgraph.vertex_pp[src]->edge = new_edge (src, dest);
 		return;
 	}
 
