@@ -111,7 +111,6 @@ void match_status (char *start, char *s, int status)
 	struct edge* edge = sgraph.vertex_pp[status]->edge;
 	if (in_set_p (syntax_tree->last_op, status)) {
 		copy_to_match_string (start, s);
-		return;
 	}
 
 	if (*s == '\0')
