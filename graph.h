@@ -33,5 +33,6 @@ extern void print_graph (void);
 extern void build_graph (void);
 extern void free_graph (void);
 extern void free_vertex (void);
+extern void free_edge (struct edge*);
 #define GET_STREE(s) (sgraph.vertex_pp[(s)]->stree)
 #endif

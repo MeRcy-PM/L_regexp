@@ -40,7 +40,6 @@ void print_edge (struct edge* edge)
 void print_graph ()
 {
 	int i;
-	struct edge* tmp;
 	printf ("--------------------PRINT GRAPH------------------\n");
 	printf ("Total Vertex number is %d\n", sgraph.n_vertex);
 	printf ("INDEX 0: Start Status.\n");
@@ -67,6 +66,9 @@ void build_graph ()
 
 void free_graph ()
 {
+	int i;
+	for (i = 0; i < sgraph.n_vertex; i++)
+		free_edge (sgraph.vertex_pp[i]->edge);
 	free (sgraph.vertex_pp);
 }
 
@@ -116,7 +118,6 @@ void add_edge_1 (int src, int dest)
 void add_edge (struct set* src, struct set* dest)
 {
 	set_p dest_tmp;
-	struct edge* new;
 	if (dest == NULL)
 		return;
 
@@ -130,8 +131,12 @@ void add_edge (struct set* src, struct set* dest)
 	}
 }
 
-void free_edge ()
+void free_edge (struct edge* edge)
 {
-
+	struct edge* tmp;
+	while (edge) {
+		tmp = edge;
+		edge = edge->next;
+		free (tmp);
+	}
 }
-

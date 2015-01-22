@@ -16,6 +16,8 @@ int main (int argc, char **argv)
 	match_expr (argv[2]);
 	printf ("Match Result is : %s\n", match_string);
 	stree_finit ();
+	if (match_string)
+		free (match_string);
 	return 0;
 }
 
