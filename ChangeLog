@@ -18,3 +18,4 @@
 	Must continue to match status instead of breaking when match end status.
 2015-1-22:
 	Clean warnings and check all malloc is free.
+	[TODO] Need output more result and DFA.
