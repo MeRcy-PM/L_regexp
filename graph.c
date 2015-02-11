@@ -3,7 +3,7 @@
 struct graph sgraph;
 vertex_p start_s;
 vertex_p cur_s;
-unsigned int status = 1;
+unsigned int status;
 
 vertex_p new_vertex_node (int index, stree_p stree)
 {
@@ -17,6 +17,7 @@ vertex_p new_vertex_node (int index, stree_p stree)
 
 void graph_init ()
 {
+	status = 1;
 	start_s = cur_s = new_vertex_node (0, NULL);
 }
 
