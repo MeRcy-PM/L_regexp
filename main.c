@@ -1,7 +1,19 @@
 #include "stree.h"
 #include "dfa.h"
+#ifndef TEST
+#include "test.h"
+#endif
 
 int main (int argc, char **argv)
+{
+#ifndef TEST
+	grep (argc, argv);
+#else
+	testsuite ();
+#endif
+}
+
+int grep (int argc, char **argv)
 {
 	if (argc <= 2) {
 		printf ("Usage: %s expr text\n", argv[0]);
