@@ -11,8 +11,10 @@ int main (int argc, char **argv)
 	grep (argv[1], argv[2]);
 	printf ("Match Result is : %s\n", match_string);
 	stree_finit ();
-	if (match_string)
+	if (match_string) {
 		free (match_string);
+		match_string = NULL;
+	}
 #else
 	testsuite ();
 #endif
@@ -40,14 +42,16 @@ void test_case (char *rexp, char *string, char *expect)
 	else
 		printf ("COMPARE COMPLETE.\n");
 	stree_finit ();
-	if (match_string)
+	if (match_string) {
 		free (match_string);
+		match_string = NULL;
+	}
 
 	return;
 }
 
 void testsuite ()
 {
-	//test_case ("a*b", "aaab", "aaab");
+	test_case ("a*b", "aaab", "aaab");
 	test_case ("(a|b)*", "aabbb", "aabbb");
 }
