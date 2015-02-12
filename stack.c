@@ -57,6 +57,8 @@ static stree_p adjust_stack_1 (int proi, int last)
 void adjust_stack (stree_p stree)
 {
 	stree_p adj;
+	/* For free memory of stree element ().  */
+	stree_p tmp = NULL;
 	if (stree == NULL) {
 		/* First of all, reduce to priority level 1.  */
 		adj = adjust_stack_1 (1, 0);
@@ -69,8 +71,11 @@ void adjust_stack (stree_p stree)
 		adj = adjust_stack_1 (GET_PRIORITY (stree), 0);
 		/* Eliminate '()'.  */
 		if (stree->type == NODE_BRACKET) {
-			pop_stack (&op_stack);
+			/* '(' will not adjust stack.  */
+			tmp = pop_stack (&op_stack);
+			free (tmp);
 			push_stack (adj, &sym_stack);
+			free (stree);
 		}
 		else {
 			push_stack (adj, &sym_stack);
