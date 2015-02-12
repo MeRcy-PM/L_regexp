@@ -92,8 +92,9 @@ static inline bool need_adjust_stack_p (stree_p stree, struct stack_stree stack)
 	if (stree->id == '(')
 		return false;
 
-	if (GET_PRIORITY (stree) < GET_PRIORITY (STACK_CUR (stack)))
+	if (GET_PRIORITY (stree) <= GET_PRIORITY (STACK_CUR (stack)))
 		return true;
+
 	return false;
 }
 

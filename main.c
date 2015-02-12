@@ -1,5 +1,9 @@
 #include "stree.h"
 #include "dfa.h"
+#ifdef __DEBUG__
+#define __PRINT__
+#endif
+
 void testsuite (void);
 int main (int argc, char **argv)
 {
@@ -28,8 +32,10 @@ int grep (char *arg1, char *arg2)
 	compute_property ();
 	build_graph ();
 	compute_nfa_trans ();
+#ifdef __PRINT__
 	print_stree (NULL);
 	print_graph ();
+#endif
 	match_expr (arg2);
 	return 0;
 }
@@ -54,4 +60,5 @@ void testsuite ()
 {
 	test_case ("a*b", "aaab", "aaab");
 	test_case ("(a|b)*", "aabbb", "aabbb");
+	test_case ("(a)", "a", "a");
 }
