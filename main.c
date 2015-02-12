@@ -20,6 +20,9 @@ int main (int argc, char **argv)
 		match_string = NULL;
 	}
 #else
+	if (argc != 1)
+		printf ("Test mode, will ignore all argument.\n");
+
 	testsuite ();
 #endif
 
