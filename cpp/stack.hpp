@@ -6,7 +6,7 @@ template <class T> class stack {
 public:
 	stack () :element (vector<T>()){}
 	~stack () {}
-	void print_stack () {
+	void print () {
 		if (element.empty ()) {
 			cout << "Empty stack." <<endl;
 			return;
@@ -32,8 +32,8 @@ template <class T> class ops : private stack<T> {
 public:
 	ops () {}
 	~ops () {}
-	void print_all_stack () {
-		this->print_stack ();
+	void print_stack () {
+		this->print ();
 	}
 	/* Push fail means it's needed adjust.  */
 	bool push (T ele) {
@@ -55,8 +55,8 @@ template <class T> class syms : private stack<T> {
 public:
 	syms () {}
 	~syms () {}
-	void print_all_stack () {
-		this->print_stack ();
+	void print_stack () {
+		this->print ();
 	}
 	void push (T ele) {
 		this->push_one_element (ele);
