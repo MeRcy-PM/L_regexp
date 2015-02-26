@@ -5,64 +5,57 @@
 template <class T> class stack {
 public:
 	stack () :element (vector<T>()){}
-	~stack () {}
-	void print () {
+	virtual ~stack () {};
+	T curr () {return element.back ();}
+	bool is_empty () {return element.empty ();}
+	void inline print_stack () {
 		if (element.empty ()) {
 			cout << "Empty stack." <<endl;
 			return;
 		}
-
+ 
 		for (typename vector<T>::iterator iter = element.begin ();
 			 iter != element.end (); ++iter) {
 			cout << *iter << endl;
 		}
 	}
-	void push_one_element (T ele) {
+	virtual bool is_need_adjust (T ele) = 0;
+	void push (T ele) {
 		element.push_back (ele);
 	}
-	T pop_one_element () {
+	T pop () {
+		if (element.empty ())
+			assert (0);
 		T temp = element.back ();
 		element.pop_back ();
 		return temp;
 	}
+private:
 	vector<T> element;
 };
 
-template <class T> class ops : private stack<T> {
+/* Declare operator stack.  */
+template <class T> class ops : public stack<T> {
 public:
 	ops () {}
 	~ops () {}
-	void print_stack () {
-		this->print ();
-	}
 	/* Push fail means it's needed adjust.  */
-	bool push (T ele) {
-		if (is_need_adjust ())
+	bool is_need_adjust (T ele) {
+		if (this->is_empty ())
 			return false;
 
-		this->push_one_element (ele);
-		return true;
-	}
-	T pop () {
-		return this->pop_one_elment ();
-	}
-	bool is_need_adjust () {
+		if (ele >= (this->curr ()))
+			return true;
+	
 		return false;
 	}
 };
 
-template <class T> class syms : private stack<T> {
+/* Declare symbol stack.  */
+template <class T> class syms : public stack<T> {
 public:
 	syms () {}
 	~syms () {}
-	void print_stack () {
-		this->print ();
-	}
-	void push (T ele) {
-		this->push_one_element (ele);
-	}
-	T pop () {
-		return this->pop_one_element ();
-	}
+	bool is_need_adjust (T ele) {return false;}
 };
 #endif
