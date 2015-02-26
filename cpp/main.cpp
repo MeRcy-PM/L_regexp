@@ -1,5 +1,5 @@
 #include "stack.hpp"
-#include "stree.h"
+#include "stree.hpp"
 
 int main (int argc, char **argv)
 {

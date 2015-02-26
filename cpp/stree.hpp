@@ -212,7 +212,8 @@ private:
  	       || (entity_p (ca) && c == '(')
  	       || (entity_p (c) && ca == '*')
     	   || (entity_p (c) && ca == ')')
-           || (ca == '*' && c == '('))
+           || (ca == '*' && c == '(')
+		   || (ca == ')' && c == '('))
           return true;
       return false;
 	}
