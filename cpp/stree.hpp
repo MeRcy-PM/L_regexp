@@ -19,13 +19,13 @@ int status;
 class stree_node {
 public:
 	stree_node () : lchild (NULL),
-					   rchild (NULL),
-					   type (NODE_INIT),
-					   nullable (true),
-					   first_op (NULL),
-					   last_op (NULL),
-					   sindex (0xffffffff),
-					   id (0xffff) {};
+				    rchild (NULL),
+					type (NODE_INIT),
+					nullable (true),
+					first_op (NULL),
+					last_op (NULL),
+					sindex (0xffffffff),
+					id (0xffff) {};
 	~stree_node () {}
 	void set_lchild (stree_node* stree) {lchild = stree;}
 	void set_rchild (stree_node* stree) {this->rchild = stree;}
