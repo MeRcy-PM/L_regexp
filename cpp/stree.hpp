@@ -165,7 +165,11 @@ private:
 			sym_stack.push (adj);
     	}   
     	else {
-        	adj = adjust_stack_1 (GET_PRIORITY (stree), 0); 
+			for (int i = 3; i > GET_PRIORITY (stree); i--) {
+				adj = adjust_stack_1 (i, 0);
+				sym_stack.push (adj);
+			}
+			adj = adjust_stack_1 (GET_PRIORITY (stree), 0);
         	/* Eliminate '()'.  */
         	if (stree->get_type ()== NODE_BRACKET) {
             	/* '(' will not adjust stack.  */
