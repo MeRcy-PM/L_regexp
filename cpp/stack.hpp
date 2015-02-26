@@ -44,7 +44,7 @@ public:
 		if (this->is_empty ())
 			return false;
 
-		if (ele >= (this->curr ()))
+		if (*ele >= (this->curr ()))
 			return true;
 	
 		return false;
