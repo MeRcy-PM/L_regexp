@@ -26,7 +26,16 @@ public:
 					last_op (NULL),
 					sindex (0xffffffff),
 					id (0xffff) {};
-	~stree_node () {}
+	~stree_node () {
+		if (lchild)
+			delete lchild;
+		if (rchild)
+			delete rchild;
+		if (first_op)
+			delete first_op;
+		if (last_op)
+			delete last_op;
+	}
 	void set_lchild (stree_node* stree) {lchild = stree;}
 	void set_rchild (stree_node* stree) {rchild = stree;}
 	void set_nullable (bool t) {nullable = t;}
@@ -122,7 +131,7 @@ typedef stree_node* stree_p;
 class syntax_tree {
 public:
 	syntax_tree () {status = 1;}
-	~syntax_tree () {status = 1;}
+	~syntax_tree () {delete root;}
 	void build_tree (char *s) {root = build_tree_1 (s);}
 	void print_syntax_tree () {root->print (0);}
 	stree_p get_root () {return root;}
