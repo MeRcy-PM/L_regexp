@@ -13,8 +13,8 @@ enum tree_type {
 };
 
 const int priority[NODE_TOTAL] = {0, 2, 1, 3, 0, 0};
-int status;
-#define GET_PRIORITY(stree) (priority[(stree)->get_type ()])
+unsigned status;
+#define GET_PRIORITY(stree) (priority[(stree)->type])
 #define CAT 257
 class stree_node {
 public:
@@ -28,7 +28,7 @@ public:
 					id (0xffff) {};
 	~stree_node () {}
 	void set_lchild (stree_node* stree) {lchild = stree;}
-	void set_rchild (stree_node* stree) {this->rchild = stree;}
+	void set_rchild (stree_node* stree) {rchild = stree;}
 	void set_nullable (bool t) {nullable = t;}
 	void set_id (unsigned short cid) {
 		id = cid;
@@ -47,8 +47,6 @@ public:
 			sindex = status++;
 		}
 	}
-	void set_first_op (void* p) {first_op = p;}
-	void set_last_op (void* p) {last_op = p;}
 	void print (int deep) {
 		if (lchild)
 			lchild->print (deep + 1);
@@ -61,11 +59,14 @@ public:
 			cout << "true";
 		else
 			cout << "false";
+		cout << "\t first_op: ";
+		print_vector (first_op);
+		cout << "\t last_op: ";
+		print_vector (last_op);
 		cout << endl;
 		if (rchild)
 			rchild->print (deep + 1);
 	}
-	enum tree_type get_type () {return this->type;}
 	/* To judge whether the stack need to adjust.  */
 	bool operator>= (stree_node *stree) {
 		if (id == '(')
@@ -76,16 +77,23 @@ public:
 
 		return false;
 	}
-private:
 	stree_node* lchild;
     stree_node* rchild;
     enum tree_type type;
     bool nullable;
-    void *first_op;
-    void *last_op;
+    vector<bool> *first_op;
+    vector<bool> *last_op;
     unsigned int sindex;
     //struct vertex* vertex;
     unsigned short id;
+private:
+	void print_vector (vector<bool> *v) {
+		unsigned int i = 0;
+		for (i = 0; i < v->size (); i++) {
+			if (v->at(i))
+				cout << i << " ";
+		}
+	}
 	void print_id () {
 		switch (type) {
 		case NODE_CAT:
@@ -113,17 +121,14 @@ private:
 typedef stree_node* stree_p;
 class syntax_tree {
 public:
-	syntax_tree () {status = 0;}
-	~syntax_tree () {status = 0;}
-	void build_tree (char *s) {
-		root = build_tree_1 (s);
-	}
-	void print_syntax_tree () {
-		root->print (0);
-	}
+	syntax_tree () {status = 1;}
+	~syntax_tree () {status = 1;}
+	void build_tree (char *s) {root = build_tree_1 (s);}
+	void print_syntax_tree () {root->print (0);}
+	stree_p get_root () {return root;}
 private:
 	void push_stack (stree_p stree) {
-		if (stree->get_type () == NODE_ENTITY)
+		if (stree->type == NODE_ENTITY)
 			sym_stack.push (stree);
 		else if (op_stack.is_need_adjust (stree))
 			adjust_stack (stree);
@@ -140,7 +145,7 @@ private:
         	return sym_stack.pop ();
 
     	stree_p ret = op_stack.pop ();
-    	if (ret->get_type () != NODE_STAR) {
+    	if (ret->type != NODE_STAR) {
         	ret->set_rchild (sym_stack.pop ());
         	ret->set_lchild (adjust_stack_1 (proi, last));
     	}
@@ -171,7 +176,7 @@ private:
 			}
 			adj = adjust_stack_1 (GET_PRIORITY (stree), 0);
         	/* Eliminate '()'.  */
-        	if (stree->get_type ()== NODE_BRACKET) {
+        	if (stree->type == NODE_BRACKET) {
             	/* '(' will not adjust stack.  */
 				tmp = op_stack.pop ();
 				delete tmp;

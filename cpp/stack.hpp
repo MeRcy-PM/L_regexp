@@ -20,9 +20,7 @@ public:
 		}
 	}
 	virtual bool is_need_adjust (T ele) = 0;
-	void push (T ele) {
-		element.push_back (ele);
-	}
+	void push (T ele) {element.push_back (ele);}
 	T pop () {
 		if (element.empty ())
 			assert (0);
