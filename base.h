@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <assert.h>
+#include <stdlib.h>
 using std::cout;
 using std::endl;
 using std::vector;
