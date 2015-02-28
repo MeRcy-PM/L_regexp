@@ -17,6 +17,8 @@ public:
 			stat[i].edge = new vector<bool> (nstat, false);
 	}
 	~dfa () {
+		for (unsigned i = 0; i < nstat; i++)
+			delete stat[i].edge;
 		if (stat != NULL) {
 			delete [] stat;
 			stat = NULL;

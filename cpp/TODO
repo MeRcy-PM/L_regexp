@@ -1,4 +1,0 @@
-2015-2-28:
-When dfa delete the edge (vector<bool>) infomation will occur double free.
-But the syntax_tree delete first_op and last_op will not.
-Check if the vector can be delete.
