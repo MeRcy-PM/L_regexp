@@ -10,7 +10,6 @@ struct vertex {
 class dfa {
 public:
 	dfa () {
-		cout << status << endl;
 		stat = new struct vertex[status];
 		nstat = status;
 		for (unsigned i = 0; i < nstat; i++)

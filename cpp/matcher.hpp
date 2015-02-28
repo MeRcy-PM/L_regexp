@@ -21,14 +21,11 @@ public:
 		}
 	}
 	void match_string (char *s) {
-		start_pos = s;
-		char *old_start = s;
 		while (*s != '\0') {
+			matched = false;
 			match_status (s, s, 0);
-			if (old_start != start_pos) {
+			if (matched)
 				s += (result.back ()).size ();
-				old_start = start_pos;
-			}
 			else
 				s++;
 		}
@@ -37,17 +34,20 @@ private:
 	bool is_end_status (int stat) {return stree->last_op->at (stat);}
 	void record_match_string (char *start, char *s) {
 		string tmp;
+		matched = true;
 		if (start == start_pos) {
 			if (result.size () == 0) {
 				tmp.assign (start, 0, s - start);
 				result.push_back (tmp);
+				return;
 			}
-			tmp = result.back ();
-			tmp.append (start, tmp.size (), (unsigned long)(s - start) - tmp.size ());
+			tmp.assign (start, 0, s - start);
+			result.pop_back ();
+			result.push_back (tmp);
 		}
 		else {
-			tmp.assign (start, 0, s - start);
 			start_pos = start;
+			tmp.assign (start, 0, s - start);
 			result.push_back (tmp);
 		}
 	}
@@ -69,6 +69,7 @@ private:
 	char *start_pos;
 	stree_p stree;
 	unsigned tstat;
+	bool matched;
 };
 
 #endif
