@@ -206,12 +206,22 @@ private:
 		if (s == NULL || s == '\0')
 			return NULL;
 
+		bool discat = false;
 		char *fw = s + 1;
 		stree_p arg = new stree_node ();
 		arg->set_id (*s);
 		push_stack (arg);
 		while (*fw != '\0') {
-			if (need_cat_p (*fw, *(fw - 1))) {
+			/* In case of '()'. Pop '('.  */
+			if (*fw == ')' && *(fw - 1) == '(') {
+				op_stack.pop ();
+				/* if 'a CAT (', need pop CAT node.  */
+				if ((op_stack.curr ())->type == NODE_CAT)
+					op_stack.pop ();
+				fw++;
+				continue;
+			}
+			if (need_cat_p (*fw, *(fw - 1), &discat)) {
 				arg = new stree_node ();
 				arg->set_id (CAT);
 				push_stack (arg);
@@ -229,15 +239,20 @@ private:
         	return true;
     	return false;
 	}
-	bool need_cat_p (char c, char ca) {
-  	  if ((entity_p (c) && entity_p (ca))
+	bool need_cat_p (char c, char ca, bool *discat) {
+		if (*discat) {
+			*discat = false;
+			return false;
+		}
+			
+  	  	if ((entity_p (c) && entity_p (ca))
  	       || (entity_p (ca) && c == '(')
  	       || (entity_p (c) && ca == '*')
     	   || (entity_p (c) && ca == ')')
            || (ca == '*' && c == '(')
 		   || (ca == ')' && c == '('))
           return true;
-      return false;
+      	return false;
 	}
 	ops<stree_p> op_stack;
 	syms<stree_p> sym_stack;

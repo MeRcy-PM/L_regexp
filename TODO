@@ -1,1 +1,2 @@
-./a.out "ab()" abc
+Done ./a.out "ab()" abc
+./a.out "ab(|)c" abcd 
