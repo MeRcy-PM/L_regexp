@@ -206,22 +206,35 @@ private:
 		if (s == NULL || s == '\0')
 			return NULL;
 
+		if (*s == ')') {
+			cout << "Error Input." << endl;
+			exit (1);
+		}
 		bool discat = false;
 		char *fw = s + 1;
+		char back = *s;
 		stree_p arg = new stree_node ();
 		arg->set_id (*s);
 		push_stack (arg);
 		while (*fw != '\0') {
+			if (*fw == '|' || *fw == '*') {
+				if (back == '('
+					|| *fw == back) {
+					fw++;
+					continue;
+				}
+			}
 			/* In case of '()'. Pop '('.  */
-			if (*fw == ')' && *(fw - 1) == '(') {
+			if (*fw == ')' && back == '(') {
 				op_stack.pop ();
 				/* if 'a CAT (', need pop CAT node.  */
 				if ((op_stack.curr ())->type == NODE_CAT)
 					op_stack.pop ();
+				back = *fw;
 				fw++;
 				continue;
 			}
-			if (need_cat_p (*fw, *(fw - 1), &discat)) {
+			if (need_cat_p (*fw, back, &discat)) {
 				arg = new stree_node ();
 				arg->set_id (CAT);
 				push_stack (arg);
@@ -229,6 +242,7 @@ private:
 			arg = new stree_node ();
 			arg->set_id (*fw);
 			push_stack (arg);
+			back = *fw;
 			fw++;
 		}
 		adjust_stack (NULL);
