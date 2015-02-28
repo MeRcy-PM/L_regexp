@@ -11,8 +11,9 @@ int main (int argc, char **argv)
 	nfa.build_graph (stree.get_root ());
 	nfa.print_graph ();
 	stree.print_syntax_tree ();
-	matcher match;
-	match.match_string (nfa., argv[2]);
+	matcher match (stree.get_root (), nfa.get_graph (), nfa.get_nstat ());
+	match.match_string (argv[2]);
+	match.print_result ();
 	return 0;
 }
 

@@ -10,15 +10,17 @@ struct vertex {
 class dfa {
 public:
 	dfa () {
+		cout << status << endl;
 		stat = new struct vertex[status];
 		nstat = status;
-		for (unsigned i = 0; i <= nstat; i++)
+		for (unsigned i = 0; i < nstat; i++)
 			stat[i].edge = new vector<bool> (nstat, false);
 	}
 	~dfa () {
-		for (unsigned i = 0; i <= nstat; i++)
-			delete stat[i].edge;
-		delete stat;
+		if (stat != NULL) {
+			delete [] stat;
+			stat = NULL;
+		}
 	}
 	void build_graph (stree_p stree) {
 		compute_property (stree);
@@ -29,6 +31,8 @@ public:
 		for (unsigned i = 0; i < nstat; i++)
 			print_edge (i);
 	}
+	struct vertex* get_graph () {return stat;}
+	unsigned get_nstat () {return nstat;}
 private:
 	void compute_start_edge (stree_p stree) {
 		for (unsigned i = 0; i < nstat; i++)

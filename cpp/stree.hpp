@@ -27,10 +27,14 @@ public:
 					sindex (0xffffffff),
 					id (0xffff) {};
 	~stree_node () {
-		if (lchild)
+		if (lchild) {
 			delete lchild;
-		if (rchild)
+			lchild = NULL;
+		}
+		if (rchild) {
 			delete rchild;
+			rchild = NULL;
+		}
 		if (first_op)
 			delete first_op;
 		if (last_op)
