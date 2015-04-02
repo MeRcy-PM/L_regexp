@@ -13,6 +13,7 @@ int main (int argc, char **argv)
 {
 	if (argc <= 2) {
 		print_help ();
+		exit (1);
 	}
 	syntax_tree stree;
 	stree.build_tree (argv[1]);
