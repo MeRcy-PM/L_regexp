@@ -1,10 +1,19 @@
+#include "stdio.h"
 #include "stack.hpp"
 #include "stree.hpp"
 #include "dfa.hpp"
 #include "matcher.hpp"
 
+void inline print_help ()
+{
+	printf ("HELP: TGREP REGULAR_EXPR STRING.\n");
+}
+
 int main (int argc, char **argv)
 {
+	if (argc <= 2) {
+		print_help ();
+	}
 	syntax_tree stree;
 	stree.build_tree (argv[1]);
 	dfa nfa;
