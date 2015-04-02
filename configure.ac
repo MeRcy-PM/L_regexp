@@ -14,7 +14,12 @@ AC_PROG_CC
 # Checks for libraries.
 AC_ARG_ENABLE(debug-mode,
      AS_HELP_STRING(--disable-debug-mode, disable support for running in debug mode),
-	 [],[enable_debug_mode=no])
+	 [case "$enableval" in
+		yes) enable_debug_mode=yes;;
+		no) enable_debug_mode=no;;
+		*) AC_MSG_ERROR([bad value $enableval for --enable-debug-mode]);;
+	  esac],
+	 [enable_debug_mode=no])
 AM_CONDITIONAL(BUILD_DEBUG_MODE, test x$enable_debug_mode = xyes)
 # Checks for header files.
 AC_HEADER_STDC
