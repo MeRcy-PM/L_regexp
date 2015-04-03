@@ -15,4 +15,4 @@ toy_grep_SOURCES = \
 				   stack.hpp \
 				   stree.hpp
 
-toy_grep_CPPFLAGS = -Wall -Werror $(EXTRA_CPPFLAGS)
+CXXFLAGS = -Wall -Werror $(EXTRA_CPPFLAGS)
