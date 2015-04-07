@@ -7,15 +7,15 @@ struct vertex {
 	vector<bool>* edge;
 };
 
-class dfa {
+class Stat {
 public:
-	dfa () {
+	Stat () {
 		stat = new struct vertex[status];
 		nstat = status;
 		for (unsigned i = 0; i < nstat; i++)
 			stat[i].edge = new vector<bool> (nstat, false);
 	}
-	~dfa () {
+	~Stat () {
 		for (unsigned i = 0; i < nstat; i++)
 			delete stat[i].edge;
 		if (stat != NULL) {
@@ -23,10 +23,13 @@ public:
 			stat = NULL;
 		}
 	}
-	void build_graph (stree_p stree) {
+	void build_graph_nfa (stree_p stree) {
 		compute_property (stree);
 		compute_start_edge (stree);
 		compute_edge (stree);
+	}
+	void build_graph_dfa (stree_p stree) {
+	
 	}
 	void print_graph () {
 		for (unsigned i = 0; i < nstat; i++)
