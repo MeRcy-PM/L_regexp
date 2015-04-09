@@ -21,8 +21,8 @@ void run_test (char *reg, char *s, int count, ...)
 	}
 	va_end (ap);
 	stree.build_tree (reg);
-	dfa nfa;
-	nfa.build_graph (stree.get_root ());
+	Stat nfa;
+	nfa.build_graph_nfa (stree.get_root ());
 	matcher match (stree.get_root (), nfa.get_graph (), nfa.get_nstat ());
 	match.match_string (s);
 
@@ -41,8 +41,6 @@ void test_star ()
 	cout << "Test for star." << endl;
 	run_test ("abc", "abc", 1, "abc");
 	run_test ("ab*c", "abbbc", 1, "abbbc");
-	run_test ("***abc", "abc", 1, "abc");
-	run_test ("*abc", "abc", 1, "abc");
 	run_test ("a*bc", "abc", 1, "abc");
 	run_test ("ab*c", "abc", 1, "abc");
 	run_test ("a*b*c", "abc", 1, "abc");
@@ -93,6 +91,8 @@ void test_error_exit ()
 {
 	run_test ("(a)|*bc", "abc", 2, "a", "bc");
 	run_test ("*", "abc", 0, "a");
+	run_test ("***abc", "abc", 1, "abc");
+	run_test ("*abc", "abc", 1, "abc");
 }
 
 void testsuite ()
