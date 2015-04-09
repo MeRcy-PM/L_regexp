@@ -117,8 +117,8 @@ int main (int argc, char **argv)
 	}
 	syntax_tree stree;
 	stree.build_tree (argv[1]);
-	dfa nfa;
-	nfa.build_graph (stree.get_root ());
+	Stat nfa;
+	nfa.build_graph_nfa (stree.get_root ());
 #ifdef DEBUG
 	nfa.print_graph ();
 	stree.print_syntax_tree ();
