@@ -30,6 +30,17 @@ public:
 				s++;
 		}
 	}
+	bool match_test (vector<string> exp)
+	{
+		if (exp.size () != result.size ())
+			return false;
+
+		for (unsigned int i = 0; i < result.size (); i++) {
+			if (result.at (i) != exp.at (i))
+				return false;
+		}
+		return true;
+	}
 private:
 	bool is_end_status (int stat) {return stree->last_op->at (stat);}
 	void record_match_string (char *start, char *s) {

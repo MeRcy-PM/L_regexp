@@ -20,10 +20,18 @@ public:
 		}
 	}
 	virtual bool is_need_adjust (T ele) = 0;
-	void push (T ele) {element.push_back (ele);}
+	void push (T ele) {
+#ifdef DEBUG
+		cout << "PUSH one element:" << endl << ele;
+#endif
+		element.push_back (ele);
+	}
 	T pop () {
 		if (element.empty ())
 			assert (0);
+#ifdef DEBUG
+		cout << "POP one element:" << endl << element.back ();
+#endif
 		T temp = element.back ();
 		element.pop_back ();
 		return temp;

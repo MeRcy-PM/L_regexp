@@ -12,10 +12,14 @@ enum tree_type {
     NODE_TOTAL
 };
 
+static const char *LEC_next = "nt\\()0\0";
+static const char *LEC = "\n\t\\()\0\0";
 const int priority[NODE_TOTAL] = {0, 2, 1, 3, 0, 0};
 unsigned status;
 #define GET_PRIORITY(stree) (priority[(stree)->type])
 #define CAT 257
+#define LBCK 258
+#define RBCK 259
 class stree_node {
 public:
 	stree_node () : lchild (NULL),
@@ -51,7 +55,7 @@ public:
 			type = NODE_OR;
 		else if (id == '*')
 			type = NODE_STAR;
-		else if (id == '(' || id == ')')
+		else if (id == LBCK || id == RBCK)
 			type = NODE_BRACKET;
 		else if (id <= 255) {
 			type = NODE_ENTITY;
@@ -73,22 +77,31 @@ public:
 		else
 			cout << "false";
 		cout << "\t first_op: ";
-		print_vector (first_op);
+		if (first_op) print_vector (first_op);
 		cout << "\t last_op: ";
-		print_vector (last_op);
+		if (last_op) print_vector (last_op);
 		cout << endl;
 		if (rchild)
 			rchild->print (deep + 1);
 	}
 	/* To judge whether the stack need to adjust.  */
 	bool operator>= (stree_node *stree) {
-		if (id == '(')
+		if (id == LBCK)
 			return false;
 
 		if (priority[type] <= GET_PRIORITY (stree))
 			return true;
 
 		return false;
+	}
+	friend std::ostream &operator << (std::ostream &out, stree_node *stree)
+	{
+#ifdef DEBUG_L2
+		stree->print (0);
+#else
+		out << stree->id << endl;
+#endif
+		return out;
 	}
 	stree_node* lchild;
     stree_node* rchild;
@@ -181,7 +194,7 @@ private:
         	/* Then pop all result.  */
         	adj = adjust_stack_1 (0, 1);
 			sym_stack.push (adj);
-    	}   
+    	}
     	else {
 			for (int i = 3; i > GET_PRIORITY (stree); i--) {
 				adj = adjust_stack_1 (i, 0);
@@ -195,12 +208,40 @@ private:
 				delete tmp;
 				sym_stack.push (adj);
 				delete stree;
-        	}   
+        	}
         	else {
 				sym_stack.push (adj);
 				op_stack.push (stree);
-        	}   
-    	}   
+        	}
+    	}
+	}
+	void build_tree_2 (char **fw, int *back)
+	{
+		stree_p arg;
+		char esc;
+		arg = new stree_node ();
+		if (**fw == '\\' && (esc = get_esc (*(*fw + 1))) != 'F') {
+			arg->set_id (esc);
+			push_stack (arg);
+			*back = esc;
+			*fw += 2;
+		}
+		else {
+			if (**fw == '(') {
+				arg->set_id (LBCK);
+				*back = LBCK;
+			}
+			else if (**fw == ')') {
+				arg->set_id (RBCK);
+				*back = RBCK;
+			}
+			else {
+				arg->set_id (**fw);
+				*back = **fw;
+			}
+			push_stack (arg);
+			(*fw)++;
+		}
 	}
 	stree_p build_tree_1 (char *s) {
 		if (s == NULL || s == '\0')
@@ -211,24 +252,38 @@ private:
 			exit (1);
 		}
 		bool discat = false;
-		char *fw = s + 1;
-		char back = *s;
-		stree_p arg = new stree_node ();
-		arg->set_id (*s);
-		push_stack (arg);
+		/* Start with * or | must be ignore.  */
+		if (*s == '*')
+			ERROR ("Nothing to repeat.\n");
+		while (*s == '|') s++;
+		char *fw = s;
+		int back = *s;
+		stree_p arg;
+		build_tree_2 (&fw, &back);
 		while (*fw != '\0') {
+			/* Ignore continuous or.  */
+			while (*fw == '|' && (*(fw + 1) == '|')) fw++;
+			/* If the or in last, ignore it.  */
+			if (*fw == '|' && (*(fw + 1) == '\0'))
+				break;
+			if (*fw == '|' && (*(fw + 1) == '*'))
+				ERROR ("Nothing to repeat.\n");
+			if (*fw == '*' && back == LBCK)
+				ERROR ("Nothing to repeat.\n");
 			if (*fw == '|' || *fw == '*') {
-				if (back == '('
+				if (back == LBCK
 					|| *fw == back) {
 					fw++;
 					continue;
 				}
 			}
+
 			/* In case of '()'. Pop '('.  */
-			if (*fw == ')' && back == '(') {
+			if (*fw == ')' && back == LBCK) {
 				op_stack.pop ();
 				/* if 'a CAT (', need pop CAT node.  */
-				if ((op_stack.curr ())->type == NODE_CAT)
+				if (!op_stack.is_empty ()
+					&& (op_stack.curr ())->type == NODE_CAT)
 					op_stack.pop ();
 				back = *fw;
 				fw++;
@@ -239,34 +294,48 @@ private:
 				arg->set_id (CAT);
 				push_stack (arg);
 			}
-			arg = new stree_node ();
-			arg->set_id (*fw);
-			push_stack (arg);
-			back = *fw;
-			fw++;
+			build_tree_2 (&fw, &back);
 		}
 		adjust_stack (NULL);
 		return sym_stack.pop ();
 	}
-	bool entity_p (char c) {
-    	if (c != '|' && c != '(' && c != ')' && c != '*')
+	bool entity_p (int c) {
+		if (c <= 255 && c != '|' && c!= '*')
         	return true;
     	return false;
 	}
-	bool need_cat_p (char c, char ca, bool *discat) {
+	bool need_cat_p (int c, int cf, bool *discat) {
 		if (*discat) {
 			*discat = false;
 			return false;
 		}
-			
-  	  	if ((entity_p (c) && entity_p (ca))
- 	       || (entity_p (ca) && c == '(')
- 	       || (entity_p (c) && ca == '*')
-    	   || (entity_p (c) && ca == ')')
-           || (ca == '*' && c == '(')
-		   || (ca == ')' && c == '('))
+		/* Make sure CAT is not the first push.
+		    Such as "()abc".  */
+		if (op_stack.is_empty () && sym_stack.is_empty ())
+			return false;
+		/* Update bracket first.  */
+		if (c == '(') c = LBCK;
+		if (c == ')') c = RBCK;
+		/* Situation such as "ab" "a(" "*a" ")a" "*(" ")(".  */
+  	  	if ((entity_p (c) && entity_p (cf))
+ 	       || (entity_p (cf) && c == LBCK)
+ 	       || (entity_p (c) && cf == '*')
+    	   || (entity_p (c) && cf == RBCK)
+           || (cf == '*' && c == LBCK)
+		   || (cf == LBCK&& c == LBCK))
           return true;
       	return false;
+	}
+	char get_esc (char c)
+	{
+		int i = 0;
+		while (LEC_next[i] != '\0') {
+			if (c == LEC_next[i]) {
+				return LEC[i];
+			}
+			i++;
+		}
+		return 'F';
 	}
 	ops<stree_p> op_stack;
 	syms<stree_p> sym_stack;

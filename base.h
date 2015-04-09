@@ -10,4 +10,10 @@ using std::endl;
 using std::vector;
 using std::string;
 
+#define ERROR(s) \
+{ \
+	printf (s);\
+	exit (1);\
+}
+
 #endif
