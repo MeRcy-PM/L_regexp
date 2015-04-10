@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "stack.hpp"
 #include "stree.hpp"
 #include "dfa.hpp"
 #include "matcher.hpp"

@@ -1,7 +1,6 @@
 #ifndef __STREE_H__
 #define __STREE_H__
 #include "base.h"
-#include "stack.hpp"
 extern void print_stree (int, struct stree_node *);
 enum tree_type {
     NODE_INIT = 0,
@@ -15,19 +14,9 @@ enum tree_type {
 
 static const char *LEC_next = "nt\\()0\0";
 static const char *LEC = "\n\t\\()\0\0";
-const int priority[NODE_TOTAL] = {0, 2, 1, 3, 0, 0};
 unsigned status;
 #define ESC_FAIL 'F'
-#define GET_PRIORITY(stree) (priority[(stree)->type])
 enum {CAT = 257, LBCK, RBCK, STAR, OR, TERM};
-/* TODO.  */
-enum token_property {
-	
-};
-struct token {
-	int id;
-	enum token_property pro;
-};
 struct stree_node {
 	stree_node () : lchild (NULL),
 				    rchild (NULL),
@@ -96,28 +85,34 @@ private:
 	void next () {
 		char c = *current++;
 		if (c == '\\') {
-			if ((id = get_esc (*current)) == ESC_FAIL) id = c;
-			else current++;
+			if ((id = get_esc (*current)) == ESC_FAIL)
+				id = c;
+			else
+				current++;
 		}
 		else if (c == '*') {
 			id = STAR;
-			while (*current == '*') current++;
+			while (*current == '*')
+				current++;
 		}
 		else if (c == '|') {
 			id = OR;
-			while (*current == '|') current++;
+			while (*current == '|')
+				current++;
 			// Or in last.  */
-			if (*current == '\0') id = TERM;
+			if (*current == '\0')
+				id = TERM;
 		}
-		else if (c == '(') id = LBCK;
-		else if (c == ')') id = RBCK;
-		else if (c == '\0') id = TERM;
+		else if (c == '(')
+			id = LBCK;
+		else if (c == ')')
+			id = RBCK;
+		else if (c == '\0')
+			id = TERM;
 		else id = c;
 	}
 	bool inline entity_p (unsigned short c) const {
-		if (c <= 255)
-        	return true;
-    	return false;
+		return c <= 255;
 	}
 	stree_p inline cat_expr (stree_p prev, stree_p next)
 	{
@@ -128,15 +123,18 @@ private:
 	}
 	stree_p expr () {
 		stree_p stree = NULL, prev = NULL, tmp = NULL;
-		if (id == 0xffff) next ();
+		if (id == 0xffff)
+			next ();
 		/* Ignore start with or.  */
-		if (id == OR) next ();
-		if (id == STAR) ERROR ("Nothing to repeat.\n");
-		if (id == TERM) {
-			if (layer != 0) ERROR ("Lost bracket.\n");
-		}
+		if (id == OR)
+			next ();
+		if (id == STAR)
+			ERROR ("Nothing to repeat.\n");
+		if (id == TERM && layer != 0)
+			ERROR ("Lost bracket.\n");
 		if (id == RBCK) {
-			if (layer == 0) ERROR ("Lost bracket.\n");
+			if (layer == 0)
+				ERROR ("Lost bracket.\n");
 			layer--;
 			return NULL;
 		}
@@ -145,7 +143,8 @@ private:
 			next ();
 			layer++;
 			stree = prev = expr ();
-			if (id != RBCK) ERROR ("Lost bracket.\n");
+			if (id != RBCK)
+				ERROR ("Lost bracket.\n");
 			next ();
 			if (stree == NULL)
 				return expr ();
@@ -162,9 +161,8 @@ private:
 				next ();
 				tmp->rchild = expr ();
 				stree = prev = tmp;
-				if (id == RBCK) {
+				if (id == RBCK)
 					return stree;
-				}
 				continue;
 			}
 			if (id == LBCK) {
@@ -199,19 +197,18 @@ private:
 			}
 			stree = prev = cat_expr (prev, stree);
 		}
-		if (id == TERM) {
-			if (layer != 0) ERROR ("Lost bracket.\n");
-		}
-		if (id == RBCK) layer--;
+		if (id == TERM && layer != 0)
+			ERROR ("Lost bracket.\n");
+		if (id == RBCK)
+			layer--;
 		return stree;
 	}
 	char get_esc (char c) const
 	{
 		int i = 0;
 		while (LEC_next[i] != '\0') {
-			if (c == LEC_next[i]) {
+			if (c == LEC_next[i])
 				return LEC[i];
-			}
 			i++;
 		}
 		return ESC_FAIL;
