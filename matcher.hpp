@@ -20,7 +20,7 @@ public:
 				cout << "The " << i + 1 << "th match string: " << result.at (i) << endl;
 		}
 	}
-	void match_string (char *s) {
+	void match_string (const char *s) {
 		while (*s != '\0') {
 			matched = false;
 			match_status (s, s, 0);
@@ -43,7 +43,7 @@ public:
 	}
 private:
 	bool is_end_status (int stat) {return stree->last_op->at (stat);}
-	void record_match_string (char *start, char *s) {
+	void record_match_string (const char *start, const char *s) {
 		string tmp;
 		matched = true;
 		if (start == start_pos) {
@@ -62,7 +62,7 @@ private:
 			result.push_back (tmp);
 		}
 	}
-	void match_status (char *start, char *s, int nstat) {
+	void match_status (const char *start, const char *s, int nstat) {
 		if (is_end_status (nstat)) {
 			record_match_string (start, s);
 		}
@@ -77,7 +77,7 @@ private:
 	}
 	vector<string> result;
 	struct vertex* stat;
-	char *start_pos;
+	const char *start_pos;
 	stree_p stree;
 	unsigned tstat;
 	bool matched;

@@ -10,7 +10,7 @@ void inline print_help ()
 	printf ("HELP: TGREP REGULAR_EXPR STRING.\n");
 }
 
-void run_test (char *reg, char *s, int count, ...)
+void run_test (const char *reg, const char *s, int count, ...)
 {
 	syntax_tree stree (reg);
 	va_list ap;

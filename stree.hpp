@@ -54,7 +54,7 @@ struct stree_node {
 typedef struct stree_node* stree_p;
 class syntax_tree {
 public:
-	syntax_tree (char *s): current (s),
+	syntax_tree (const char *s): current (s),
 							  id (0xffff),
 							  layer (0) {status = 1;}
 	~syntax_tree () {delete root;}
@@ -223,7 +223,7 @@ private:
 	}
 	stree_p root;
 	/* Current for token.  */
-	char *current;
+	const char *current;
 	/* May use struct token to descript format like '[A-Z]'.  */
 	unsigned short id;
 	int layer;
