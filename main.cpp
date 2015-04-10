@@ -4,6 +4,7 @@
 #include "dfa.hpp"
 #include "matcher.hpp"
 #include <stdarg.h>
+#include "debug.hpp"
 
 void inline print_help ()
 {
@@ -12,7 +13,7 @@ void inline print_help ()
 
 void run_test (char *reg, char *s, int count, ...)
 {
-	syntax_tree stree;
+	syntax_tree stree (reg);
 	va_list ap;
 	vector<string> result;
 	va_start (ap, count);
@@ -20,7 +21,7 @@ void run_test (char *reg, char *s, int count, ...)
 		result.push_back (va_arg (ap, char *));
 	}
 	va_end (ap);
-	stree.build_tree (reg);
+	stree.build_tree ();
 	Stat nfa;
 	nfa.build_graph_nfa (stree.get_root ());
 	matcher match (stree.get_root (), nfa.get_graph (), nfa.get_nstat ());
@@ -84,7 +85,10 @@ void test_or ()
 
 void test_mix_expr ()
 {
+	cout << "Mix expr test start" << endl;
 	run_test ("(a*|b)c", "aaacbc", 2, "aaac", "bc");
+	run_test ("(a|b(c*)*)|d", "abcc", 2, "a", "bcc");
+	cout << "Mix expr test OK" << endl;
 }
 
 void test_error_exit ()
@@ -95,11 +99,11 @@ void test_error_exit ()
 	run_test ("*abc", "abc", 1, "abc");
 }
 
-void testsuite ()
+void quick_testsuite ()
 {
 	test_star ();
-	test_bracket ();
 	test_or ();
+	test_bracket ();
 	test_mix_expr ();
 }
 
@@ -107,7 +111,7 @@ int main (int argc, char **argv)
 {
 	/* Test mode.  */
 	if (argc == 1) {
-		testsuite ();
+		quick_testsuite ();
 		return 0;
 	}
 	/* Execute mode.  */
@@ -115,8 +119,8 @@ int main (int argc, char **argv)
 		print_help ();
 		exit (1);
 	}
-	syntax_tree stree;
-	stree.build_tree (argv[1]);
+	syntax_tree stree (argv[1]);
+	stree.build_tree ();
 	Stat nfa;
 	nfa.build_graph_nfa (stree.get_root ());
 #ifdef DEBUG

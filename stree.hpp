@@ -2,6 +2,7 @@
 #define __STREE_H__
 #include "base.h"
 #include "stack.hpp"
+extern void print_stree (int, struct stree_node *);
 enum tree_type {
     NODE_INIT = 0,
     NODE_CAT,
@@ -16,12 +17,18 @@ static const char *LEC_next = "nt\\()0\0";
 static const char *LEC = "\n\t\\()\0\0";
 const int priority[NODE_TOTAL] = {0, 2, 1, 3, 0, 0};
 unsigned status;
+#define ESC_FAIL 'F'
 #define GET_PRIORITY(stree) (priority[(stree)->type])
-#define CAT 257
-#define LBCK 258
-#define RBCK 259
-class stree_node {
-public:
+enum {CAT = 257, LBCK, RBCK, STAR, OR, TERM};
+/* TODO.  */
+enum token_property {
+	
+};
+struct token {
+	int id;
+	enum token_property pro;
+};
+struct stree_node {
 	stree_node () : lchild (NULL),
 				    rchild (NULL),
 					type (NODE_INIT),
@@ -44,65 +51,6 @@ public:
 		if (last_op)
 			delete last_op;
 	}
-	void set_lchild (stree_node* stree) {lchild = stree;}
-	void set_rchild (stree_node* stree) {rchild = stree;}
-	void set_nullable (bool t) {nullable = t;}
-	void set_id (unsigned short cid) {
-		id = cid;
-		if (id == CAT)
-			type = NODE_CAT;
-		else if (id == '|')
-			type = NODE_OR;
-		else if (id == '*')
-			type = NODE_STAR;
-		else if (id == LBCK || id == RBCK)
-			type = NODE_BRACKET;
-		else if (id <= 255) {
-			type = NODE_ENTITY;
-			nullable = false;
-			//Vertex
-			sindex = status++;
-		}
-	}
-	void print (int deep) {
-		if (lchild)
-			lchild->print (deep + 1);
-		for (int i = 0; i < deep; i++)
-			cout << "\t";
-		//cout << "Index:" << sindex << "\t";
-		this->print_id ();
-		cout << " na: ";
-		if  (nullable) 
-			cout << "true";
-		else
-			cout << "false";
-		cout << "\t first_op: ";
-		if (first_op) print_vector (first_op);
-		cout << "\t last_op: ";
-		if (last_op) print_vector (last_op);
-		cout << endl;
-		if (rchild)
-			rchild->print (deep + 1);
-	}
-	/* To judge whether the stack need to adjust.  */
-	bool operator>= (stree_node *stree) {
-		if (id == LBCK)
-			return false;
-
-		if (priority[type] <= GET_PRIORITY (stree))
-			return true;
-
-		return false;
-	}
-	friend std::ostream &operator << (std::ostream &out, stree_node *stree)
-	{
-#ifdef DEBUG_L2
-		stree->print (0);
-#else
-		out << stree->id << endl;
-#endif
-		return out;
-	}
 	stree_node* lchild;
     stree_node* rchild;
     enum tree_type type;
@@ -110,223 +58,154 @@ public:
     vector<bool> *first_op;
     vector<bool> *last_op;
     unsigned int sindex;
-    //struct vertex* vertex;
     unsigned short id;
-private:
-	void print_vector (vector<bool> *v) {
-		unsigned int i = 0;
-		for (i = 0; i < v->size (); i++) {
-			if (v->at(i))
-				cout << i << " ";
-		}
-	}
-	void print_id () {
-		switch (type) {
-		case NODE_CAT:
-			cout << "CAT";
-			break;
-		case NODE_ENTITY:
-			cout << "ENTITY (" << (char)id << ")";
-			break;
-		case NODE_OR:
-			cout << "OR";
-			break;
-		case NODE_STAR:
-			cout << "STAR";
-			break;
-		case NODE_BRACKET:
-			cout << "BRACKET";
-			break;
-		default:
-			assert (0);
-			break;
-		}
-	}
 };
 
-typedef stree_node* stree_p;
+typedef struct stree_node* stree_p;
 class syntax_tree {
 public:
-	syntax_tree () {status = 1;}
+	syntax_tree (char *s): current (s),
+							  id (0xffff),
+							  layer (0) {status = 1;}
 	~syntax_tree () {delete root;}
-	void build_tree (char *s) {root = build_tree_1 (s);}
-	void print_syntax_tree () {root->print (0);}
+	void build_tree () {root = expr ();}
+	void print_syntax_tree () {print_stree (0, root);}
 	stree_p get_root () {return root;}
 private:
-	void push_stack (stree_p stree) {
-		if (stree->type == NODE_ENTITY)
-			sym_stack.push (stree);
-		else if (op_stack.is_need_adjust (stree))
-			adjust_stack (stree);
-		else
-			op_stack.push (stree);
-	}
-	stree_p adjust_stack_1 (int proi, int last) {
-    	if (op_stack.is_empty ())
-        	if (!sym_stack.is_empty ())
-            	return sym_stack.pop ();
-
-    	if ((!last)
-        	&& proi >= GET_PRIORITY (op_stack.curr ()))
-        	return sym_stack.pop ();
-
-    	stree_p ret = op_stack.pop ();
-    	if (ret->type != NODE_STAR) {
-        	ret->set_rchild (sym_stack.pop ());
-        	ret->set_lchild (adjust_stack_1 (proi, last));
-    	}
-    	else {
-        	/* Integrate the STAR EXPR as a symbol then continue.  */
-        	ret->set_lchild (sym_stack.pop ());
-			sym_stack.push (ret);
-        	return adjust_stack_1 (proi, last);
-    	}
-    	return ret;
-	}
-	void adjust_stack (stree_p stree) {
-    	stree_p adj;
-    	/* For free memory of stree element ().  */
-    	stree_p tmp = NULL;
-    	if (stree == NULL) {
-       		/* First of all, reduce to priority level 1.  */
-        	adj = adjust_stack_1 (1, 0);
-			sym_stack.push (adj);
-        	/* Then pop all result.  */
-        	adj = adjust_stack_1 (0, 1);
-			sym_stack.push (adj);
-    	}
-    	else {
-			for (int i = 3; i > GET_PRIORITY (stree); i--) {
-				adj = adjust_stack_1 (i, 0);
-				sym_stack.push (adj);
-			}
-			adj = adjust_stack_1 (GET_PRIORITY (stree), 0);
-        	/* Eliminate '()'.  */
-        	if (stree->type == NODE_BRACKET) {
-            	/* '(' will not adjust stack.  */
-				tmp = op_stack.pop ();
-				delete tmp;
-				sym_stack.push (adj);
-				delete stree;
-        	}
-        	else {
-				sym_stack.push (adj);
-				op_stack.push (stree);
-        	}
-    	}
-	}
-	void build_tree_2 (char **fw, int *back)
-	{
-		stree_p arg;
-		char esc;
-		arg = new stree_node ();
-		if (**fw == '\\' && (esc = get_esc (*(*fw + 1))) != 'F') {
-			arg->set_id (esc);
-			push_stack (arg);
-			*back = esc;
-			*fw += 2;
-		}
-		else {
-			if (**fw == '(') {
-				arg->set_id (LBCK);
-				*back = LBCK;
-			}
-			else if (**fw == ')') {
-				arg->set_id (RBCK);
-				*back = RBCK;
-			}
-			else {
-				arg->set_id (**fw);
-				*back = **fw;
-			}
-			push_stack (arg);
-			(*fw)++;
+	void set_node_id (unsigned short cid, stree_p stree) {
+		stree->id = cid;
+		if (cid == CAT)
+			stree->type = NODE_CAT;
+		else if (cid == OR)
+			stree->type = NODE_OR;
+		else if (cid == STAR)
+			stree->type = NODE_STAR;
+		else if (cid == LBCK || cid == RBCK)
+			stree->type = NODE_BRACKET;
+		else if (cid <= 255) {
+			stree->type = NODE_ENTITY;
+			stree->nullable = false;
+			stree->sindex = status++;
 		}
 	}
-	stree_p build_tree_1 (char *s) {
-		if (s == NULL || s == '\0')
-			return NULL;
-
-		if (*s == ')') {
-			cout << "Error Input." << endl;
-			exit (1);
-		}
-		bool discat = false;
-		/* Start with * or | must be ignore.  */
-		if (*s == '*')
-			ERROR ("Nothing to repeat.\n");
-		while (*s == '|') s++;
-		char *fw = s;
-		int back = *s;
-		stree_p arg;
-		build_tree_2 (&fw, &back);
-		while (*fw != '\0') {
-			/* Ignore continuous or.  */
-			while (*fw == '|' && (*(fw + 1) == '|')) fw++;
-			/* If the or in last, ignore it.  */
-			if (*fw == '|' && (*(fw + 1) == '\0'))
-				break;
-			if (*fw == '|' && (*(fw + 1) == '*'))
-				ERROR ("Nothing to repeat.\n");
-			if (*fw == '*' && back == LBCK)
-				ERROR ("Nothing to repeat.\n");
-			if (*fw == '|' || *fw == '*') {
-				if (back == LBCK
-					|| *fw == back) {
-					fw++;
-					continue;
-				}
-			}
-
-			/* In case of '()'. Pop '('.  */
-			if (*fw == ')' && back == LBCK) {
-				op_stack.pop ();
-				/* if 'a CAT (', need pop CAT node.  */
-				if (!op_stack.is_empty ()
-					&& (op_stack.curr ())->type == NODE_CAT)
-					op_stack.pop ();
-				back = *fw;
-				fw++;
-				continue;
-			}
-			if (need_cat_p (*fw, back, &discat)) {
-				arg = new stree_node ();
-				arg->set_id (CAT);
-				push_stack (arg);
-			}
-			build_tree_2 (&fw, &back);
-		}
-		adjust_stack (NULL);
-		return sym_stack.pop ();
+	stree_p inline build_node (unsigned short cid) {
+		stree_p tmp = new stree_node;
+		set_node_id (cid, tmp);
+		return tmp;
 	}
-	bool entity_p (int c) {
-		if (c <= 255 && c != '|' && c!= '*')
+	void next () {
+		char c = *current++;
+		if (c == '\\') {
+			if ((id = get_esc (*current)) == ESC_FAIL) id = c;
+			else current++;
+		}
+		else if (c == '*') {
+			id = STAR;
+			while (*current == '*') current++;
+		}
+		else if (c == '|') {
+			id = OR;
+			while (*current == '|') current++;
+			// Or in last.  */
+			if (*current == '\0') id = TERM;
+		}
+		else if (c == '(') id = LBCK;
+		else if (c == ')') id = RBCK;
+		else if (c == '\0') id = TERM;
+		else id = c;
+	}
+	bool inline entity_p (unsigned short c) const {
+		if (c <= 255)
         	return true;
     	return false;
 	}
-	bool need_cat_p (int c, int cf, bool *discat) {
-		if (*discat) {
-			*discat = false;
-			return false;
-		}
-		/* Make sure CAT is not the first push.
-		    Such as "()abc".  */
-		if (op_stack.is_empty () && sym_stack.is_empty ())
-			return false;
-		/* Update bracket first.  */
-		if (c == '(') c = LBCK;
-		if (c == ')') c = RBCK;
-		/* Situation such as "ab" "a(" "*a" ")a" "*(" ")(".  */
-  	  	if ((entity_p (c) && entity_p (cf))
- 	       || (entity_p (cf) && c == LBCK)
- 	       || (entity_p (c) && cf == '*')
-    	   || (entity_p (c) && cf == RBCK)
-           || (cf == '*' && c == LBCK)
-		   || (cf == LBCK&& c == LBCK))
-          return true;
-      	return false;
+	stree_p inline cat_expr (stree_p prev, stree_p next)
+	{
+		stree_p tmp = build_node (CAT);
+		tmp->lchild = prev;
+		tmp->rchild = next;
+		return tmp;
 	}
-	char get_esc (char c)
+	stree_p expr () {
+		stree_p stree = NULL, prev = NULL, tmp = NULL;
+		if (id == 0xffff) next ();
+		/* Ignore start with or.  */
+		if (id == OR) next ();
+		if (id == STAR) ERROR ("Nothing to repeat.\n");
+		if (id == TERM) {
+			if (layer != 0) ERROR ("Lost bracket.\n");
+		}
+		if (id == RBCK) {
+			if (layer == 0) ERROR ("Lost bracket.\n");
+			layer--;
+			return NULL;
+		}
+		/* Match a bracket expr, continue.  */
+		if (id == LBCK) {
+			next ();
+			layer++;
+			stree = prev = expr ();
+			if (id != RBCK) ERROR ("Lost bracket.\n");
+			next ();
+			if (stree == NULL)
+				return expr ();
+		}
+		if (stree == NULL) {
+			/* Generate stree.  */
+			stree = prev = build_node (id);
+			next ();
+		}
+		while (id != RBCK && id != TERM) {
+			if (id == OR) {
+				tmp = build_node (OR);
+				tmp->lchild = prev;
+				next ();
+				tmp->rchild = expr ();
+				stree = prev = tmp;
+				if (id == RBCK) {
+					return stree;
+				}
+				continue;
+			}
+			if (id == LBCK) {
+				layer++;
+				next ();
+				stree = expr ();
+				next ();
+				/* Skip "()".  */
+				if (stree == NULL)
+					stree = prev;
+				else
+					stree = prev = cat_expr (prev, stree);
+				continue;
+			}
+			else {
+				stree = build_node (id);
+				next ();
+			}
+			/* If ab*, a cat b, then see star,
+			    need to add star node to the stree's rchild.  */
+			if (stree->id == STAR) {
+				if (prev->rchild) {
+					stree->lchild = prev->rchild;
+					prev->rchild = stree;
+					stree = prev;
+				}
+				else {
+					stree->lchild = prev;
+					prev = stree;
+				}
+				continue;
+			}
+			stree = prev = cat_expr (prev, stree);
+		}
+		if (id == TERM) {
+			if (layer != 0) ERROR ("Lost bracket.\n");
+		}
+		if (id == RBCK) layer--;
+		return stree;
+	}
+	char get_esc (char c) const
 	{
 		int i = 0;
 		while (LEC_next[i] != '\0') {
@@ -335,11 +214,14 @@ private:
 			}
 			i++;
 		}
-		return 'F';
+		return ESC_FAIL;
 	}
-	ops<stree_p> op_stack;
-	syms<stree_p> sym_stack;
 	stree_p root;
+	/* Current for token.  */
+	char *current;
+	/* May use struct token to descript format like '[A-Z]'.  */
+	unsigned short id;
+	int layer;
 };
 
 #endif

@@ -123,6 +123,7 @@ private:
 	        break;
 	    default:
 	        cout << "Error Tree Type Detected." << endl;
+			assert (0);
 	        exit (1);
 	    }
     	return;
