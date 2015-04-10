@@ -12,7 +12,7 @@ toy_grep_SOURCES = \
 				   base.h \
 				   dfa.hpp \
 				   matcher.hpp \
-				   stack.hpp \
+				   debug.hpp \
 				   stree.hpp
 
 CXXFLAGS = -Wall -Werror $(EXTRA_CPPFLAGS)
