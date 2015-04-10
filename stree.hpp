@@ -15,6 +15,7 @@ enum tree_type {
 static const char *LEC_next = "nt\\()0\0";
 static const char *LEC = "\n\t\\()\0\0";
 unsigned status;
+/* Means that unsupport this ESC.  */
 #define ESC_FAIL 'F'
 enum {CAT = 257, LBCK, RBCK, STAR, OR, TERM};
 struct stree_node {
@@ -99,9 +100,14 @@ private:
 			id = OR;
 			while (*current == '|')
 				current++;
-			// Or in last.  */
+			/* Or in last.  */
 			if (*current == '\0')
 				id = TERM;
+			/* Or before ')'.  */
+			else if (*current == ')') {
+				id = RBCK;
+				current++;
+			}
 		}
 		else if (c == '(')
 			id = LBCK;
@@ -110,9 +116,6 @@ private:
 		else if (c == '\0')
 			id = TERM;
 		else id = c;
-	}
-	bool inline entity_p (unsigned short c) const {
-		return c <= 255;
 	}
 	stree_p inline cat_expr (stree_p prev, stree_p next)
 	{
@@ -123,6 +126,7 @@ private:
 	}
 	stree_p expr () {
 		stree_p stree = NULL, prev = NULL, tmp = NULL;
+		/* Initialization.  */
 		if (id == 0xffff)
 			next ();
 		/* Ignore start with or.  */
@@ -138,7 +142,8 @@ private:
 			layer--;
 			return NULL;
 		}
-		/* Match a bracket expr, continue.  */
+		/* This is the case of bracket in front of expression.
+		    Building a tree for '('. is unexpected.  */
 		if (id == LBCK) {
 			next ();
 			layer++;
@@ -146,6 +151,7 @@ private:
 			if (id != RBCK)
 				ERROR ("Lost bracket.\n");
 			next ();
+			/* Skip the "()".  */
 			if (stree == NULL)
 				return expr ();
 		}
@@ -161,6 +167,7 @@ private:
 				next ();
 				tmp->rchild = expr ();
 				stree = prev = tmp;
+				/* Like "(b|c)".  */
 				if (id == RBCK)
 					return stree;
 				continue;
@@ -174,6 +181,7 @@ private:
 				if (stree == NULL)
 					stree = prev;
 				else
+					/* New expr must CAT to prev.  */
 					stree = prev = cat_expr (prev, stree);
 				continue;
 			}

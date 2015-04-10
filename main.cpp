@@ -65,6 +65,7 @@ void test_bracket ()
 	run_test ("()()abc", "abc", 1, "abc");
 	run_test ("()abc()", "abc", 1, "abc");
 	run_test ("()abc()()()", "abc", 1, "abc");
+	run_test ("()a()bc()", "abc", 1, "abc");
 	cout << "Bracket test OK" << endl;
 }
 
@@ -87,6 +88,7 @@ void test_mix_expr ()
 	cout << "Mix expr test start" << endl;
 	run_test ("(a*|b)c", "aaacbc", 2, "aaac", "bc");
 	run_test ("(a|b(c*)*)|d", "abcc", 2, "a", "bcc");
+	run_test ("a(b|)", "abc", 1, "ab");
 	cout << "Mix expr test OK" << endl;
 }
 
