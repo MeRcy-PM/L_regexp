@@ -53,6 +53,7 @@ void test_star ()
 void test_bracket ()
 {
 	cout << "Bracket test start" << endl;
+    run_test ("()", "abc", 0);
 	run_test ("(a)bc", "abc", 1, "abc");
 	run_test ("(ab)c", "abc", 1, "abc");
 	run_test ("(abc)", "abc", 1, "abc");
@@ -86,6 +87,8 @@ void test_or ()
 void test_mix_expr ()
 {
 	cout << "Mix expr test start" << endl;
+    run_test ("", "abc", 0);
+    run_test ("|", "abc", 0);
 	run_test ("(a*|b)c", "aaacbc", 2, "aaac", "bc");
 	run_test ("(a|b(c*)*)|d", "abcc", 2, "a", "bcc");
 	run_test ("a(b|)", "abc", 1, "ab");

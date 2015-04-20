@@ -21,6 +21,7 @@ public:
 		}
 	}
 	void match_string (const char *s) {
+        if (tstat == 1) return;
 		while (*s != '\0') {
 			matched = false;
 			match_status (s, s, 0);

@@ -136,6 +136,8 @@ private:
 			ERROR ("Nothing to repeat.\n");
 		if (id == TERM && layer != 0)
 			ERROR ("Lost bracket.\n");
+        if (id == TERM)
+            return NULL;
 		if (id == RBCK) {
 			if (layer == 0)
 				ERROR ("Lost bracket.\n");

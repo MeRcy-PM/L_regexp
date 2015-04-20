@@ -10,12 +10,16 @@ struct vertex {
 class Stat {
 public:
 	Stat () {
-		stat = new struct vertex[status];
-		nstat = status;
-		for (unsigned i = 0; i < nstat; i++)
-			stat[i].edge = new vector<bool> (nstat, false);
+        if (status == 1) nstat = status;
+        else {
+            stat = new struct vertex[status];
+            nstat = status;
+            for (unsigned i = 0; i < nstat; i++)
+                stat[i].edge = new vector<bool> (nstat, false);
+        }
 	}
 	~Stat () {
+        if (is_empty()) return;
 		for (unsigned i = 0; i < nstat; i++)
 			delete stat[i].edge;
 		if (stat != NULL) {
@@ -23,15 +27,22 @@ public:
 			stat = NULL;
 		}
 	}
+    bool is_empty () {return nstat == 1;}
 	void build_graph_nfa (stree_p stree) {
-		compute_property (stree);
-		compute_start_edge (stree);
-		compute_edge (stree);
+        if (!is_empty()) {
+            compute_property (stree);
+            compute_start_edge (stree);
+            compute_edge (stree);
+        }
 	}
 	void build_graph_dfa (stree_p stree) {
 	
 	}
 	void print_graph () {
+        if (is_empty()) {
+            cout << "Empty expression." << endl;
+            return;
+        }
 		for (unsigned i = 0; i < nstat; i++)
 			print_edge (i);
 	}
@@ -47,8 +58,8 @@ private:
 			cout << "Set Error." << endl;
 			exit (1);
 		}
-		unsigned size = vsrc->size ();
-		for (unsigned i = 1; i < size; i++) {
+		unsigned long size = vsrc->size ();
+		for (unsigned long i = 1; i < size; i++) {
 			if (vsrc->at (i)) {
 				for (unsigned j = 1; j < size; j++)
 					stat[i].edge->at (j) = vdest->at (j) | stat[i].edge->at (j);
@@ -72,9 +83,9 @@ private:
 			cout << "Set error." << endl;
 			exit (1);
 		}
-		unsigned int size = v1->size ();
+		unsigned long size = v1->size ();
 		vector<bool>* tmp = new vector<bool> (size);
-		for (unsigned int i = 0; i < tmp->size (); i++) {
+		for (unsigned long i = 0; i < tmp->size (); i++) {
 			tmp->at(i) = v1->at(i) | v2->at(i);
 		}
 		return tmp;
@@ -133,7 +144,7 @@ private:
 		for (unsigned i = 0; i < stat[index].edge->size (); i++)
 			if (stat[index].edge->at (i))
 				cout << "\tIndex " << i << " Trans word " << stat[i].id << endl;
-	}
+    }
 	unsigned nstat;
 	struct vertex* stat;
 };
