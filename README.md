@@ -1,5 +1,5 @@
 # L_regexp
-Learning for lexical analysis. 
+Learning for lexical analysis.
 
 Chinese:
 程序简介：
